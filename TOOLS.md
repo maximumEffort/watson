@@ -1,40 +1,33 @@
-# TOOLS.md - Local Notes
+# TOOLS.md — Watson's Environment
 
-Skills define _how_ tools work. This file is for _your_ specifics — the stuff that's unique to your setup.
+## Host Access
 
-## What Goes Here
+Watson runs as user `watson` on the same machine as Eve.
+The `agents` group gives read access to Eve's workspace and home directory.
 
-Things like:
+### Eve's key paths (readable)
+- Eve workspace: /home/kraetes/eve/
+- Eve config: /home/kraetes/.openclaw/openclaw.json
+- Eve stop-hook log: /home/kraetes/eve/memory/.session/stop-hook.log
+- Eve session files: /home/kraetes/.claude/
 
-- Camera names and locations
-- SSH hosts and aliases
-- Preferred voices for TTS
-- Speaker/room names
-- Device nicknames
-- Anything environment-specific
+### Useful diagnostic commands
 
-## Examples
+Check if Eve is stuck:
+  ps -eo pid,etime,cmd | grep claude | grep -v grep
 
-```markdown
-### Cameras
+Eve gateway status:
+  journalctl -u openclaw-gateway --since "30 min ago" --no-pager | tail -20
 
-- living-room → Main area, 180° wide angle
-- front-door → Entrance, motion-triggered
+Eve recent stop-hook runs:
+  tail -20 /home/kraetes/eve/memory/.session/stop-hook.log
 
-### SSH
+## Watson's Gateway
 
-- home-server → 192.168.1.100, user: admin
+- Port: 18790
+- Service: watson-gateway (system service — sudo systemctl restart watson-gateway)
+- Web UI: http://127.0.0.1:18790
 
-### TTS
+## Channels
 
-- Preferred voice: "Nova" (warm, slightly British)
-- Default speaker: Kitchen HomePod
-```
-
-## Why Separate?
-
-Skills are shared. Your setup is yours. Keeping them apart means you can update skills without losing your notes, and share skills without leaking your infrastructure.
-
----
-
-Add whatever helps you do your job. This is your cheat sheet.
+- Telegram: @KraetesWatsonBot (primary)
