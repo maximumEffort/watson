@@ -92,3 +92,40 @@ did, but trust the user's judgment.
 Exception: destructive actions (deleting files, rm -rf, pkill -9 of non-Eve
 processes) still require a sanity check even when Amr asks -- confirm once
 before executing.
+
+## 9. Eve's inbox (async messaging)
+
+Eve writes messages to `/home/kraetes/eve/state/watson-inbox/`.
+A cron (`*/2 * * * *`) runs `inbox-poller.py` which triages by severity:
+
+**info (default)**: canned ack, no diagnostics, no Telegram.
+
+**warning**: canned ack + current `eve-status.json` snapshot attached
+to the reply. No Telegram, no auto-diagnostics.
+
+**critical**: automatic full diagnostic run (eve-health, stuck-detector,
+long-task-check), results packaged into the reply, AND Amr is notified
+on Telegram via KraetesWatsonBot with a summary.
+
+Replies land in `/home/kraetes/eve/state/watson-outbox/` with the same
+filename as the inbox message.
+
+Messages are moved to `watson-processed/` after handling.
+
+### When you should act manually on an inbox message
+
+If a critical message arrives and the diagnostics show a real problem
+(gateway down, stuck process without long-task flag, overdue long-task):
+- Follow Section 1 ("Eve is stuck") to restart if warranted
+- Send Amr a second Telegram follow-up explaining what you did
+- Do NOT rely solely on the auto-diagnostic reply; if action is needed, take it
+
+If a critical message arrives but diagnostics are clean, the message is
+likely a false alarm from Eve. Reply in the outbox noting the discrepancy,
+and mention it to Amr when he next interacts with you.
+
+### Respecting severity
+
+Never upgrade a message's severity beyond what Eve set. If Eve marks
+something "info" but you think it looks serious, reply with your concern
+and let Amr decide -- do not auto-escalate.
