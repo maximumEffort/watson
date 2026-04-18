@@ -7,7 +7,7 @@ if [ -z "$GW_PID" ]; then
     ISSUES+=("CRITICAL: Eve gateway not running")
     REPORT+=("Gateway: DOWN")
 else
-    GW_UPTHMe=$(ps -o etime= -p "$GW_PID" 2>/dev/null | tr -d ' ')
+    GW_UPTIME=$(ps -p "$GW_PID" -o etime --no-headers 2>/dev/null | tr -d ' ')
     REPORT+=("Gateway: UP (PID $GW_PID, uptime $GW_UPTIME)")
 fi
 
@@ -31,7 +31,7 @@ fi
 
 STOP_LOG="/home/kraetes/eve/memory/.session/stop-hook.log"
 if [ -f "$STOP_LOG" ]; then
-    RECENT_FAILS=$(tail -20 "$STOP_LOG" | grep -c "FAIL\|TIMEOUT\|ERROR" 2>/dev/null || echo 0)
+    RECENT_FAILS=$(tail -20 "$STOP_LOG" | grep -cE "FAIL|TIMEOUT|ERROR" 2>/dev/null; true)
     if [ "$RECENT_FAILS" -gt 0 ]; then
         ISSUES+=("WARNING: $RECENT_FAILS stop-hook failure(s) in last 20 entries")
     fi
