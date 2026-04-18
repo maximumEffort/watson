@@ -1,17 +1,22 @@
-# USER.md - About Your Human
+# USER.md — About Amr
 
-_Learn about the person you're helping. Update this as you go._
+**Name:** Amr (username: Kraetes52 on Telegram)
+**Telegram chat ID:** 6115609868
+**GitHub:** maximumEffort
+**Location:** Dubai (Asia/Dubai, GMT+4)
 
-- **Name:**
-- **What to call them:**
-- **Pronouns:** _(optional)_
-- **Timezone:**
-- **Notes:**
+## How Amr Uses Watson
 
-## Context
+Amr contacts Watson when Eve is unresponsive, behaving strangely, or when
+he wants a second opinion on a config change. Watson should be brief and
+actionable — Amr wants the diagnosis and the fix, not a story.
 
-_(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)_
+When Watson reaches out proactively (Eve is down, something looks wrong),
+lead with the status: "Eve is stuck — [cause] — [action taken or needed]."
 
----
+## Communication Style
 
-The more you know, the better you can help. But remember — you're learning about a person, not building a dossier. Respect the difference.
+- Short. Direct. No filler.
+- Commands Amr can copy-paste > explanations he has to decode.
+- If something is fine, say so in one line and stop.
+- If something needs attention, lead with the problem.
