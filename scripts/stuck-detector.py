@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 """
 stuck-detector.py — Detect Claude processes that have been running too long.
+Respects Eve's long-task flag at /home/kraetes/eve/state/long-task.json.
 Exit 0: all clear. Exit 1: stuck process found.
 Usage: python3 stuck-detector.py [--warn-mins N] [--critical-mins N]
 """
-import subprocess, sys, argparse
-from datetime import datetime
+import subprocess, sys, argparse, json, os
+from datetime import datetime, timezone
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--warn-mins", type=int, default=45)
 parser.add_argument("--critical-mins", type=int, default=90)
 args = parser.parse_args()
+
+FLAG = "/home/kraetes/eve/state/long-task.json"
 
 def etime_to_mins(etime):
     etime = etime.strip()
@@ -27,6 +30,21 @@ def etime_to_mins(etime):
     except:
         return 0
     return 0
+
+# Check long-task flag
+long_task = None
+if os.path.exists(FLAG):
+    try:
+        data = json.load(open(FLAG))
+        elapsed = (datetime.now(timezone.utc).timestamp() - data.get("started", 0)) / 60
+        expected = data.get("expected_mins", 60)
+        if elapsed < expected:
+            long_task = data.get("task", "long task")
+            print(f"INFO: Long task in progress ({long_task}) -- {elapsed:.0f}/{expected}m, thresholds raised")
+            args.warn_mins = max(args.warn_mins, int(expected) + 15)
+            args.critical_mins = max(args.critical_mins, int(expected) + 30)
+    except Exception:
+        pass
 
 result = subprocess.run(
     ["pgrep", "-u", "kraetes", "-f", "^claude"],
@@ -52,9 +70,9 @@ for pid in pids:
     mins = etime_to_mins(etime)
 
     if mins >= args.critical_mins:
-        issues.append(f"CRITICAL: PID {pid} stuck {mins:.0f} min ({etime}) — {cmd}")
+        issues.append(f"CRITICAL: PID {pid} stuck {mins:.0f} min ({etime}) -- {cmd}")
     elif mins >= args.warn_mins:
-        warnings.append(f"WARNING: PID {pid} running {mins:.0f} min ({etime}) — {cmd}")
+        warnings.append(f"WARNING: PID {pid} running {mins:.0f} min ({etime}) -- {cmd}")
 
 for w in warnings:
     print(w)
